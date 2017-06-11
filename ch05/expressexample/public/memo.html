@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>메모</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+	<h1>나의 메모</h1>
+	<hr>
+	<form action="/process/memo" method="post">
+		<label>작 성 자</label>
+		<input type="text" name="name">
+		<label>작성일시</label>
+		<input type="datetime-local" name="daytime">
+		내용 : 
+		<input type="text" name = "content">
+		<input type="submit" value="저장" name="submit">
+	</form>
+</body>
+</html>
