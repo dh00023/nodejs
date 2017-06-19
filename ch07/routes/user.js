@@ -1,28 +1,17 @@
-/*var database;
-var UserSchema;
-var UserModel;
-
-//데이터베이스 객체, 스키마 객체, 모델 객체를 이 모듈에서 사용할 수 있도록 전달
-var init = function(db,schema,model){
-	console.log('init호출');
-
-	database = db;
-	UserSchema = schema;
-	UserModel = model;
-}
-*/
-// 로그인 라우팅 함수 - 데이터베이스의 정보와 비교
 var login = function(req, res) {
-	console.log('/process/login 호출됨.');
+	console.log('user(user2.js) 모듈 안에 있는 login 호출됨.');
 
-	// 요청 파라미터 확인
+    // 요청 파라미터 확인
     var paramId = req.body.id || req.query.id;
     var paramPassword = req.body.password || req.query.password;
 	
     console.log('요청 파라미터 : ' + paramId + ', ' + paramPassword);
 	
+    // 데이터베이스 객체 참조
+	var database = req.app.get('database');
+	
     // 데이터베이스 객체가 초기화된 경우, authUser 함수 호출하여 사용자 인증
-	if (database) {
+	if (database.db) {
 		authUser(database, paramId, paramPassword, function(err, docs) {
 			// 에러 발생 시, 클라이언트로 에러 전송
 			if (err) {
@@ -67,20 +56,20 @@ var login = function(req, res) {
 	
 };
 
-
-
-// 사용자 추가 라우팅 함수 - 클라이언트에서 보내오는 데이터를 이용해 데이터베이스에 추가
 var adduser = function(req, res) {
-	console.log('/process/adduser 호출됨.');
+	console.log('user(user2.js) 모듈 안에 있는 adduser 호출됨.');
 
-    var paramId = req.body.id || req.query.id;
+	var paramId = req.body.id || req.query.id;
     var paramPassword = req.body.password || req.query.password;
     var paramName = req.body.name || req.query.name;
 	
     console.log('요청 파라미터 : ' + paramId + ', ' + paramPassword + ', ' + paramName);
     
+    // 데이터베이스 객체 참조
+	var database = req.app.get('database');
+	
     // 데이터베이스 객체가 초기화된 경우, addUser 함수 호출하여 사용자 추가
-	if (database) {
+	if (database.db) {
 		addUser(database, paramId, paramPassword, paramName, function(err, addedUser) {
             // 동일한 id로 추가하려는 경우 에러 발생 - 클라이언트로 에러 전송
 			if (err) {
@@ -115,16 +104,16 @@ var adduser = function(req, res) {
 	
 };
 
-
-
-//사용자 리스트 함수
 var listuser = function(req, res) {
-	console.log('/process/listuser 호출됨.');
-
+	console.log('user(user2.js) 모듈 안에 있는 listuser 호출됨.');
+ 
+    // 데이터베이스 객체 참조
+	var database = req.app.get('database');
+    
     // 데이터베이스 객체가 초기화된 경우, 모델 객체의 findAll 메소드 호출
-	if (database) {
+	if (database.db) {
 		// 1. 모든 사용자 검색
-		UserModel.findAll(function(err, results) {
+		database.UserModel.findAll(function(err, results) {
 			// 에러 발생 시, 클라이언트로 에러 전송
 			if (err) {
                 console.error('사용자 리스트 조회 중 에러 발생 : ' + err.stack);
@@ -137,7 +126,7 @@ var listuser = function(req, res) {
                 return;
             }
 			  
-			if (results) {  // 결과 객체 있으면 리스트 전송
+			if (results) {
 				console.dir(results);
  
 				res.writeHead('200', {'Content-Type':'text/html;charset=utf8'});
@@ -152,25 +141,27 @@ var listuser = function(req, res) {
 			
 				res.write('</ul></div>');
 				res.end();
-			} else {  // 결과 객체가 없으면 실패 응답 전송
+			} else {
 				res.writeHead('200', {'Content-Type':'text/html;charset=utf8'});
 				res.write('<h2>사용자 리스트 조회  실패</h2>');
 				res.end();
 			}
 		});
-	} else {  // 데이터베이스 객체가 초기화되지 않은 경우 실패 응답 전송
+	} else {
 		res.writeHead('200', {'Content-Type':'text/html;charset=utf8'});
 		res.write('<h2>데이터베이스 연결 실패</h2>');
 		res.end();
 	}
 	
 };
-// 사용자를 인증하는 함수 : 아이디로 먼저 찾고 비밀번호를 그 다음에 비교하도록 함
+
+
+//사용자를 인증하는 함수 : 아이디로 먼저 찾고 비밀번호를 그 다음에 비교하도록 함
 var authUser = function(database, id, password, callback) {
-	console.log('authUser 호출됨 : ' + id + ', ' + password);
+	console.log('authUser 호출됨.');
 	
-    // 1. 아이디를 이용해 검색
-	UserModel.findById(id, function(err, results) {
+	// 1. 아이디를 이용해 검색
+	database.UserModel.findById(id, function(err, results) {
 		if (err) {
 			callback(err, null);
 			return;
@@ -183,7 +174,7 @@ var authUser = function(database, id, password, callback) {
 			console.log('아이디와 일치하는 사용자 찾음.');
 			
 			// 2. 패스워드 확인 : 모델 인스턴스를 객체를 만들고 authenticate() 메소드 호출
-			var user = new UserModel({id:id});
+			var user = new database.UserModel({id:id});
 			var authenticated = user.authenticate(password, results[0]._doc.salt, results[0]._doc.hashed_password);
 			if (authenticated) {
 				console.log('비밀번호 일치함');
@@ -203,25 +194,27 @@ var authUser = function(database, id, password, callback) {
 }
 
 
-//사용자를 추가하는 함수
+//사용자를 등록하는 함수
 var addUser = function(database, id, password, name, callback) {
-	console.log('addUser 호출됨 : ' + id + ', ' + password + ', ' + name);
+	console.log('addUser 호출됨.');
 	
 	// UserModel 인스턴스 생성
-	var user = new UserModel({"id":id, "password":password, "name":name});
+	var user = new database.UserModel({"id":id, "password":password, "name":name});
 
-	// save()로 저장 : 저장 성공 시 addedUser 객체가 파라미터로 전달됨
-	user.save(function(err, addedUser) {
+	// save()로 저장
+	user.save(function(err) {
 		if (err) {
 			callback(err, null);
 			return;
 		}
 		
 	    console.log("사용자 데이터 추가함.");
-	    callback(null, addedUser);
+	    callback(null, user);
 	     
 	});
 }
+
+
 module.exports.login = login;
 module.exports.adduser = adduser;
-module.exports.listuser= listuser;
+module.exports.listuser = listuser;
