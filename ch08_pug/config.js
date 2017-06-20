@@ -16,5 +16,6 @@ module.exports = {
 	    {file:'./user', path:'/process/login', method:'login', type:'post'}					// user.login 
 	    ,{file:'./user', path:'/process/adduser', method:'adduser', type:'post'}				// user.adduser 
 	    ,{file:'./user', path:'/process/listuser', method:'listuser', type:'post'}			// user.listuser 
+	    ,{file:'./test', path:'/process/test1', method:'test1', type:'post'}
 	]
 }
