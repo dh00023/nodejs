@@ -1,10 +1,3 @@
-/**
- * 데이터베이스 스키마를 정의하는 모듈
- *
- * @date 2016-11-10
- * @author Mike
- */
-
 var crypto = require('crypto');
 
 var Schema = {};
@@ -13,11 +6,10 @@ Schema.createSchema = function(mongoose) {
 	
 	// 스키마 정의
 	var UserSchema = mongoose.Schema({
-	    id: {type: String, required: true, unique: true, 'default':''},
+	    email: {type: String, 'default':''},
 	    hashed_password: {type: String, required: true, 'default':''},
 	    salt: {type:String, required:true},
 	    name: {type: String, index: 'hashed', 'default':''},
-	    age: {type: Number, 'default': -1},
 	    created_at: {type: Date, index: {unique: false}, 'default': Date.now},
 	    updated_at: {type: Date, index: {unique: false}, 'default': Date.now}
 	});
@@ -76,13 +68,9 @@ Schema.createSchema = function(mongoose) {
 	})
 	
 	// 필수 속성에 대한 유효성 확인 (길이값 체크)
-	UserSchema.path('id').validate(function (id) {
-		return id.length;
-	}, 'id 칼럼의 값이 없습니다.');
-	
-	UserSchema.path('name').validate(function (name) {
-		return name.length;
-	}, 'name 칼럼의 값이 없습니다.');
+	UserSchema.path('email').validate(function (email) {
+		return email.length;
+	}, 'email 칼럼의 값이 없습니다.');
 	
 	UserSchema.path('hashed_password').validate(function (hashed_password) {
 		return hashed_password.length;
@@ -90,8 +78,8 @@ Schema.createSchema = function(mongoose) {
 	
 	   
 	// 스키마에 static 메소드 추가
-	UserSchema.static('findById', function(id, callback) {
-		return this.find({id:id}, callback);
+	UserSchema.static('findByEmail', function(email, callback) {
+		return this.find({email:email}, callback);
 	});
 	
 	UserSchema.static('findAll', function(callback) {
