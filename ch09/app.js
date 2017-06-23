@@ -67,8 +67,71 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
 
+
 //라우팅 정보를 읽어들여 라우팅 설정
-route_loader.init(app, express.Router());
+var router = express.Router();
+route_loader.init(app, router);
+
+// 홈화면 - index.ejs 템플릿으로 홈 화면이 보이도록 함
+router.route('/').get(function(req,res){
+	console.log('/패스 요청됨.');
+	res.render('index.ejs');
+});
+
+//로그인 폼 링크
+app.get('/login',function(req,res){
+	console.log('/login 패스 요청됨');
+	res.render('login.ejs',{message: req.flash('loginMessage')});
+});
+
+app.post('/login',passport.authenticate('local-login',{
+	successRedirect : '/profile',
+	failureRedirect : '/login',
+	failureFlash : true
+});
+
+//회원가입 폼 링크
+app.get('/signup',function(req,res){
+	console.log('/signup 패스 요청됨');
+	res.render('signup.ejs',{message: req.flash('signupMessage')});
+});
+
+app.post('/signup',passport.authenticate('local-signup',{
+	successRedirect : '/profile',
+	failureRedirect : '/signup',
+	failureFlash : true
+});
+
+// 프로필 화면 - 로그인 여부를 확인할 수 있도록 먼저 isLoggedIn 미들웨어 실행
+router.route('/profile').get(function(req,res){
+	console.log("/profile 패스 요청됨");
+
+	//인증된 경우 req.user 객체에 사용자 정보 있으며, 인증이 안된 경우에는 false값임
+	console.log("req.user 객체의 값");
+	console.dir(req.user);
+
+	//인증이 안된 경우
+	if(!req.user){
+		console.log("사용자 인증이 안 된 상태임");
+		res.redirect('/');
+		return;
+	}
+
+	//인증된 경우
+	console.log("사용자 인증된 상태임");
+	if(Array.isArray(req.user)){
+		res.render('profile.ejs',{user: req.user[0]._doc});
+	}else{
+		res.render('profile.ejs',{user:req.user});
+	}
+});
+
+//로그아웃
+app.get('/logout',function(req,res){
+	console.log("/logout 패스 요청됨");
+	req.logout();
+	res.redirect('/');
+});
 
 var LocalStratege = require('passport-local').Strategy;
 
