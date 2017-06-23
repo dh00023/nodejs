@@ -136,6 +136,22 @@ passport.use('local-signup',new LocalStratege({
 	});
 }));
 
+//사용자 인증에 성공했을 때 호출
+passport.serializeUser(function(user,done){
+	console.log('serializeUser() 호출됨.');
+	console.dir(user);
+
+	done(null,user);
+});
+
+//사용자 인증 이후 사용자 요청이 있을 때마다 호출
+passport.deserializeUser(function(user,done){
+	console.log('deserializeUser() 호출됨');
+	console.dir(user);
+
+	done(null,user);
+});
+
 //===== 404 에러 페이지 처리 =====//
 var errorHandler = expressErrorHandler({
  static: {
