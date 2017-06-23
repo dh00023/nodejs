@@ -88,7 +88,7 @@ app.post('/login',passport.authenticate('local-login',{
 	successRedirect : '/profile',
 	failureRedirect : '/login',
 	failureFlash : true
-});
+}));
 
 //회원가입 폼 링크
 app.get('/signup',function(req,res){
@@ -100,7 +100,7 @@ app.post('/signup',passport.authenticate('local-signup',{
 	successRedirect : '/profile',
 	failureRedirect : '/signup',
 	failureFlash : true
-});
+}));
 
 // 프로필 화면 - 로그인 여부를 확인할 수 있도록 먼저 isLoggedIn 미들웨어 실행
 router.route('/profile').get(function(req,res){
@@ -133,10 +133,10 @@ app.get('/logout',function(req,res){
 	res.redirect('/');
 });
 
-var LocalStratege = require('passport-local').Strategy;
+var LocalStrategy = require('passport-local').Strategy;
 
 //패스포트 로그인 설정
-passport.use('local-login',new LocalStratege({
+passport.use('local-login',new LocalStrategy({
 	usernameField : 'email',
 	passwordField: 'password',
 	passReqToCallback: true
@@ -150,7 +150,7 @@ passport.use('local-login',new LocalStratege({
   		//등록된 사용자가 없는 경우
   		if(!user){
   			console.log('계정이 일치하지 않음');
-  			return done(null,false,req.falsh('loginMessage','등록된 계정이 없습니다.'));
+  			return done(null,false,req.flash('loginMessage','등록된 계정이 없습니다.'));
   		}
   		//비밀번호를 비교하여 맞지 않는 경우
   		var authenticated = user.authenticate(password,user._doc.salt,user._doc.hashed_password);
@@ -166,11 +166,11 @@ passport.use('local-login',new LocalStratege({
 }));
 
 //패스포트 회원가입 설정
-passport.use('local-signup',new LocalStratege({
+passport.use('local-signup',new LocalStrategy({
 	usernameField : 'email',
-	passwordField : 'password',
-	passReqToCallback : true
-},function(req,email,password,done){
+	passwordField: 'password',
+	passReqToCallback: true
+  },function(req,email,password,done){
 	//요청 파라미터 중 name파라미터 확인
 	var paramName = req.body.name || req.query.name;
 	console.log('passport의 local-signup호출됨 : '+email+password+paramName);
