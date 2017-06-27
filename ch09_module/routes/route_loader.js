@@ -1,25 +1,15 @@
-/**
- * 라우팅 모듈을 로딩하여 설정
- * 
- * 라우팅 모듈 파일에 대한 정보는 config.js의 route_info 배열에 등록함
- *
- * @date 2016-11-10
- * @author Mike
- */
-
 var route_loader = {};
 
-var config = require('../config');
+var config = require('../config/config');
 
 
 route_loader.init = function(app, router) {
 	console.log('route_loader.init 호출됨.');
 	return initRoutes(app, router);
-}
+};
 
 // route_info에 정의된 라우팅 정보 처리
 function initRoutes(app, router) {
-
 	var infoLen = config.route_info.length;
 	console.log('설정에 정의된 라우팅 모듈의 수 : %d', infoLen);
  
@@ -48,4 +38,3 @@ function initRoutes(app, router) {
 }
 
 module.exports = route_loader;
-

@@ -1,4 +1,3 @@
-
 // Express 기본 모듈 불러오기
 var express = require('express')
   , http = require('http')
@@ -23,7 +22,7 @@ var flash = require('connect-flash');
 
 
 // 모듈로 분리한 설정 파일 불러오기
-var config = require('./config');
+var config = require('./config/config');
 
 // 모듈로 분리한 데이터베이스 파일 불러오기
 var database = require('./database/database');
@@ -75,11 +74,13 @@ app.use(expressSession({
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
-
  
-//라우팅 정보를 읽어 들여 라우팅 설정
+
+
+//라우팅 정보를 읽어들여 라우팅 설정
 var router = express.Router();
 route_loader.init(app, router);
+
 
 // 패스포트 설정
 var configPassport = require('./config/passport');
@@ -88,6 +89,9 @@ configPassport(app, passport);
 // 패스포트 라우팅 설정
 var userPassport = require('./routes/user_passport');
 userPassport(router, passport);
+
+
+
 //===== 404 에러 페이지 처리 =====//
 var errorHandler = expressErrorHandler({
  static: {
