@@ -1,14 +1,3 @@
-/**
- * 패스포트 사용하기
- * 
- * 패스포트 모듈에서 로그인 인증을 처리하도록 함
- * 페이스북으로 로그인, 트위터로 로그인, 구글로 로그인 기능 포함
- *
- * @date 2016-11-10
- * @author Mike
- */
- 
-
 // Express 기본 모듈 불러오기
 var express = require('express')
   , http = require('http')
@@ -41,8 +30,11 @@ var database = require('./database/database');
 // 모듈로 분리한 라우팅 파일 불러오기
 var route_loader = require('./routes/route_loader');
 
- 
+// socket.io 모듈 불러들이기
+var socketio = require('socket.io');
 
+// cors 사용 - 클라이언트에서 ajax로 요청하면 CORS 지원
+var cors = require('cors');
 
 // 익스프레스 객체 생성
 var app = express();
@@ -87,6 +79,8 @@ app.use(passport.session());
 app.use(flash());
  
 
+//cors를 미들웨어로 사용하도록 등록
+app.use(cors());
 
 //라우팅 정보를 읽어들여 라우팅 설정
 var router = express.Router();
@@ -144,4 +138,17 @@ var server = http.createServer(app).listen(app.get('port'), function(){
 	// 데이터베이스 초기화
 	database.init(app, config);
    
+});
+
+// socket.io 서버를 시작
+var io = socketio.listen(server);
+console.log("socket.io 요청을 받아들일 준비가 되었습니다.");
+
+//클라이언트가 연결했을 때의 이벤트 처리
+io.sockets.on('connection',function(socket){
+	console.log('connection info : ',socket.request.connection._peername);
+
+	// 소켓 객체에 클라이언트 Host, Port 정보 속성으로 추가
+	socket.remoteAddress = socket.request.connection._peername.address;
+	socket.remotePort = socket.request.connection._peername.port;
 });
