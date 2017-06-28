@@ -7,8 +7,8 @@ module.exports = {
 	route_info: [
 	],
 	facebook:{
-		clientID : '',
-		clientSecret: '',
-		callbackURL : ''
+		clientID : '1530568723684515',
+		clientSecret: 'b92f1354cadb4b49027c3df8814744a4',
+		callbackURL : 'http://localhost:3000/auth/facebook/callback'
 	}
 }
