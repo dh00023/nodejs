@@ -1,14 +1,3 @@
-/**
- * 패스포트 사용하기
- * 
- * 패스포트 모듈에서 로그인 인증을 처리하도록 함
- * 페이스북으로 로그인, 트위터로 로그인, 구글로 로그인 기능 포함
- *
- * @date 2016-11-10
- * @author Mike
- */
- 
-
 // Express 기본 모듈 불러오기
 var express = require('express')
   , http = require('http')
@@ -41,8 +30,10 @@ var database = require('./database/database');
 // 모듈로 분리한 라우팅 파일 불러오기
 var route_loader = require('./routes/route_loader');
 
- 
+var handler_loader = require('./handlers/handler_loader');
 
+//JSON-RPC 사용
+var jayson = require('jayson');
 
 // 익스프레스 객체 생성
 var app = express();
@@ -101,7 +92,11 @@ configPassport(app, passport);
 var userPassport = require('./routes/user_passport');
 userPassport(router, passport);
 
+//JSON-RPC 핸들러 정보를 읽어 들여 핸들러 경로 설정
+var jsonrpc_api_path = config.jsonrpc_api_path || '/api';
+handler_loader.init(jayson,app,jsonrpc_api_path);
 
+console.log("JSON-RPC를 ["+jsonrpc_api_path+'] 패스에서 사용하도록 설정함.');
 
 //===== 404 에러 페이지 처리 =====//
 var errorHandler = expressErrorHandler({
